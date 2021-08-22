@@ -6,7 +6,7 @@ LDFLAGS = -ldl
 
 OBJS = error.o gcc.o io.o jit.o loader.o subprocess.o
 
-default: driver
+default: driver0 driver1 driver2
 
 error.o: error.c error.h
 gcc.o: gcc.c gcc.h
@@ -19,12 +19,22 @@ subprocess.o: subprocess.c subprocess.h
 libjit.a: $(OBJS)
 	ar cr -o $@ $(OBJS)
 
-driver: driver.c libjit.a
+driver0: driver0.c libjit.a
 	$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS)
+
+driver1: driver1.c libjit.a
+	$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS)
+
+# NOTE: use -Wl,--export-dynamic to export all symbols
+# from the program so they are available to JITed code
+driver2: driver2.c libjit.a
+	$(CC) $(CFLAGS) -Wl,--export-dynamic $^ -o $@ $(LDFLAGS)
 
 clean:
 	rm -f *.o
-	rm -f driver
+	rm -f driver0
+	rm -f driver1
+	rm -f driver2
 	rm -f libjit.a
 
 .PHONY: clean
