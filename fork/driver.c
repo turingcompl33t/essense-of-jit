@@ -6,26 +6,26 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-// #include "loader.h"
-#include "gcc.h"
+#include "jit.h"
 
-// const char path[] = "/home/kad/dev/jit/fork/libtest.so";
-
-// typedef int (*add_one_f)();
-
+// Some source code to JIT
 const char source[] = "int return_one() { return 1; }";
 
+// The signature for the function we JIT
+typedef int (*add_one_f)();
+
 int main() {
-  // void* handle = loader_load(path);
-  // add_one_f fn = loader_resolve(handle, "return_one");
-
-  // int one = fn();
-  // printf("result: %d\n", one);
-
-  // loader_unload(handle);
   
-  char* name = gcc_compile(source, sizeof(source));
-  free(name);
+  // Compile the source to a module
+  module_t* module = jit_compile(source);
 
+  // Resolve the function of interest
+  add_one_f fn = jit_resolve_symbol(module, "return_one");
+
+  // Call the JITed function
+  int one = fn();
+  printf("result: %d\n", one);
+
+  jit_release(module);
   return EXIT_SUCCESS;
 }

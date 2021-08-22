@@ -11,13 +11,12 @@
 /**
  * Compile C source code to a shared object.
  * @param source The source code
- * @param length The length of the source code
  * @return The absolute path to the shared object
  * 
  * NOTE: User is responsible for:
  * - freeing the string allocated for the path
  * - unlinking the shared object file
  */
-char* gcc_compile(const char* source, size_t length);
+char* gcc_compile(const char* source);
 
 #endif // GCC_H

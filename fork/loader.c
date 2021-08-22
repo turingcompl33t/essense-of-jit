@@ -20,7 +20,7 @@ void loader_unload(void* handle) {
   if (dlclose(handle) != 0) fatal_error(dlerror());
 }
 
-void* loader_resolve(void* handle, char* symbol) {
+void* loader_resolve(void* handle, const char* symbol) {
   void* resolved = dlsym(handle, symbol);
   // This is not REALLY a fatal error because this
   // just indicates the symbol is not present, but

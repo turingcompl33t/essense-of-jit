@@ -25,6 +25,6 @@ void loader_unload(void* handle);
  * @param symbol The symbol to resolve
  * @return The address to which the symbol is resolved
  */
-void* loader_resolve(void* handle, char* symbol);
+void* loader_resolve(void* handle, const char* symbol);
 
 #endif // LOADER_H

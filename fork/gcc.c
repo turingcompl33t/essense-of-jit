@@ -20,6 +20,27 @@
 #define OUTPUT_EXT_LENGTH    (3)  // .so
 #define BUFFER_SIZE        (128)
 
+/**
+ * NOTE: There were a couple of things I wanted to do in 
+ * this implementation that I ran into trouble with: 
+ * - First, I wanted to avoid creation of a temporary file
+ * 	 for the input and just get GCC to read from its stdin
+ * 	 over a pipe. This is fine, and it reads the source, 
+ *   but after that it continues to hang on reading from
+ * 	 the pipe (debugged with strace) even when I close the
+ * 	 write end in the parent process. I'm sure this is
+ * 	 just something small I am overlooking, but man it is
+ * 	 frustrating trying to debug these issues.
+ * - Once I resolved to just read the input from a temporary
+ * 	 file, I ran into the second issue of writing the output
+ * 	 file (the shared object). Naturally, GCC allows one to
+ * 	 specify the path to the output with -o, but for some 
+ * 	 reason I always got a linker error ("no such file")
+ * 	 when using this feature. Eventually I just let GCC write
+ * 	 to its default location in the current directory and
+ * 	 then mv the output file where I want it. 
+ */
+
 /** 
  * Create the path to a temporary file to use as
  * the input to GCC.
@@ -68,10 +89,9 @@ static char* gcc_make_output_filename() {
 /**
  * Build a shared object from the given source code.
  * @param source The source code
- * @param length The length of the source code
  * @return `true` if the operation is successful, `false` otherwise
  */
-static bool gcc_build_shared_object(const char* source, size_t length) {
+static bool gcc_build_shared_object(const char* source) {
 	// Write the source code to a temporary file
 	char* input_path = gcc_make_input_filename();
 	FILE* input = fopen(input_path, "w");
@@ -80,7 +100,7 @@ static bool gcc_build_shared_object(const char* source, size_t length) {
 	// The source code is a null-terminated string,
 	// but there is no need to write the terminator
 	// to the input source file for GCC
-	size_t write_size = length - 1;
+	const size_t write_size = strlen(source);
 	if (fwrite(source, sizeof(byte_t), write_size, input) < write_size) {
 		fatal_error("fwrite()");
 	}
@@ -143,8 +163,8 @@ static char* gcc_move_shared_object() {
 	return output_path;
 }
 
-char* gcc_compile(const char* source, size_t length) {
-	if (gcc_build_shared_object(source, length)) {
+char* gcc_compile(const char* source) {
+	if (gcc_build_shared_object(source)) {
 		return gcc_move_shared_object();
 	}
 	fatal_error("failed to compile shared object");
