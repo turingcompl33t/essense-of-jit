@@ -18,6 +18,6 @@
  * - freeing the string allocated for the path
  * - unlinking the shared object file
  */
-char* gcc_compile_shared_object(const char* source, size_t length);
+char* gcc_compile(const char* source, size_t length);
 
 #endif // GCC_H

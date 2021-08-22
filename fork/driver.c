@@ -24,8 +24,7 @@ int main() {
 
   // loader_unload(handle);
   
-  char* name = gcc_compile_shared_object(source, sizeof(source));
-  puts(name);
+  char* name = gcc_compile(source, sizeof(source));
   free(name);
 
   return EXIT_SUCCESS;
