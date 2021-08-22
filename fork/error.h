@@ -10,6 +10,6 @@
  * Print an error message and terminate the program.
  * @param msg The message to print
  */
-void fatal_error(const char* msg);
+void fatal_error(const char* msg) __attribute__((noreturn));
 
 #endif // ERROR_H
